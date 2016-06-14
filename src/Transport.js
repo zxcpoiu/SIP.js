@@ -9,6 +9,7 @@
  * @param {SIP.UA} ua
  * @param {Object} server ws_server Object
  */
+const util = require('util');
 module.exports = function (SIP, WebSocket) {
 var Transport,
   C = {
@@ -344,7 +345,8 @@ Transport.prototype = {
   * @param {event} e
   */
   onError: function(e) {
-    this.logger.warn('WebSocket connection error: ' + JSON.stringify(e));
+    //this.logger.warn('WebSocket connection error: ' + JSON.stringify(e));
+    this.logger.warn('WebSocket connection error: ' + util.inspect(e, {depth:3}));
   },
 
   /**
