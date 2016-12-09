@@ -544,6 +544,7 @@ MediaHandler.prototype = Object.create(SIP.MediaHandler.prototype, {
         self.emit('peerConnection-' + methodName + 'Failed', e);
         throw e;
       })
+      .then(window.customSdpHacks)
       .then(SIP.Utils.promisify(pc, 'setLocalDescription'))
       .catch(function localDescError(e) {
         self.emit('peerConnection-selLocalDescriptionFailed', e);
@@ -562,6 +563,7 @@ MediaHandler.prototype = Object.create(SIP.MediaHandler.prototype, {
         // TODO: should make this optional if we want to support ICE Trickling
         if (pc.localDescription.sdp.indexOf('candidate') < 0) {
           return SIP.Utils.promisify(pc, methodName, true)(constraints)
+            .then(window.customSdpHacks)
             .then(function(sdp){
               return sdp.sdp;
             });
