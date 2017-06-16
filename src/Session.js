@@ -1010,8 +1010,8 @@ InviteServerContext = function(ua, request) {
       self.rel100 = c;
     }
   }
-  set100rel('require', SIP.C.supported.REQUIRED);
-  set100rel('supported', SIP.C.supported.SUPPORTED);
+  //set100rel('require', SIP.C.supported.REQUIRED);
+  //set100rel('supported', SIP.C.supported.SUPPORTED);
 
   /* Set the to_tag before
    * replying a response code that will create a dialog.
