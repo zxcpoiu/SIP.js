@@ -689,6 +689,7 @@ UA.prototype.receiveRequest = function(request) {
       case SIP.C.CANCEL:
         session = this.findSession(request);
         if(session) {
+          this.destroyTransaction(transaction.transaction);
           session.receiveRequest(request);
         } else {
           this.logger.warn('received CANCEL request for a non existent session');
