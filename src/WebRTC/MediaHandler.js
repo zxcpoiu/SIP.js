@@ -189,7 +189,8 @@ MediaHandler.prototype = Object.create(SIP.MediaHandler.prototype, {
     this.emit('setDescription', rawDescription);
 
     var description = new SIP.WebRTC.RTCSessionDescription(rawDescription);
-    return SIP.Utils.promisify(this.peerConnection, 'setRemoteDescription')(description)
+    //return SIP.Utils.promisify(this.peerConnection, 'setRemoteDescription')(description)
+    return this.peerConnection['setRemoteDescription'](description)
       .catch(function setRemoteDescriptionError(e) {
         self.emit('peerConnection-setRemoteDescriptionFailed', e);
         throw e;
@@ -539,13 +540,15 @@ MediaHandler.prototype = Object.create(SIP.MediaHandler.prototype, {
     self.ready = false;
     methodName = self.hasOffer('remote') ? 'createAnswer' : 'createOffer';
 
-    return SIP.Utils.promisify(pc, methodName, true)(constraints)
+    //return SIP.Utils.promisify(pc, methodName, true)(constraints)
+    return pc[methodName](constraints)
       .catch(function methodError(e) {
         self.emit('peerConnection-' + methodName + 'Failed', e);
         throw e;
       })
       .then(window.customSdpHacks)
-      .then(SIP.Utils.promisify(pc, 'setLocalDescription'))
+      //.then(SIP.Utils.promisify(pc, 'setLocalDescription'))
+      .then((sessionDescription) => pc['setLocalDescription'](sessionDescription)) // --- use arrow function to preserve this
       .catch(function localDescError(e) {
         self.emit('peerConnection-selLocalDescriptionFailed', e);
         throw e;
@@ -562,11 +565,17 @@ MediaHandler.prototype = Object.create(SIP.MediaHandler.prototype, {
       .then(function shouldAppendIceToSdp() {
         // TODO: should make this optional if we want to support ICE Trickling
         if (pc.localDescription.sdp.indexOf('candidate') < 0) {
-          return SIP.Utils.promisify(pc, methodName, true)(constraints)
-            .then(window.customSdpHacks)
-            .then(function(sdp){
-              return sdp.sdp;
-            });
+          return pc.getLocalDescription()
+          .then((sdp) => {
+            return (sdp && sdp.sdp ? sdp.sdp : pc.localDescription.sdp);
+          })
+          .catch((data) => {
+            return '';
+          })
+          .then(window.customSdpHacks)
+          .then(function(sdp) {
+            return (typeof sdp === 'string' ? sdp : sdp.sdp);
+          });
         } else {
           return '';
         }

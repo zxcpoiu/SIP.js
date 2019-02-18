@@ -25,7 +25,7 @@ module.exports = {
   },
 
   MediaStream: WebRTC.MediaStream,
-  getUserMedia: WebRTC.getUserMedia,
+  getUserMedia: WebRTC.mediaDevices.getUserMedia,
   RTCPeerConnection: WebRTC.RTCPeerConnection,
   RTCSessionDescription: WebRTC.RTCSessionDescription,
 
